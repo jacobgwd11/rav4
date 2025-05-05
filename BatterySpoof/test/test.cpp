@@ -1,0 +1,50 @@
+#include <assert.h>
+#include <iostream>
+
+#include "../spoof.h"
+
+void test_checksum() {
+  unsigned char arr[4] = {1, 1, 2, 4};
+
+  assert(1 == checksum(arr, 1));
+  assert(0 == checksum(arr, 2));
+  assert(6 == checksum(arr, 4));
+}
+
+void test_healthy_packet() {
+  init_packet();
+
+  unsigned char *packet;
+  int length = healthy_packet(&packet);
+
+  assert(255 == packet[0]);
+  assert(length - 2 == packet[1]);
+  assert(62 == length);
+  assert(0x31 == packet[2]);
+
+  unsigned char sum = 0;
+  for (int i = 1; i <= packet[1]; i++) {
+    sum ^= packet[i];
+  }
+  assert(packet[packet[1] + 1] == sum);
+
+  for (int i = 3; i < 3 + 24 * 2; i += 2) {
+    int voltage = (packet[i + 1] << 8) + packet[i];
+    assert(14292 == voltage);
+  }
+
+  for (int i = 3 + 24 * 2; i < 3 + 24 * 2 + 4 * 2; i += 2) {
+    int temperature = (packet[i + 1] << 8) + packet[i];
+    assert(6703 == temperature);
+  }
+}
+
+void run_tests() {
+  test_checksum();
+  test_healthy_packet();
+}
+
+int main(int argc, char **argv) {
+  run_tests();
+  std::cout << "[BatterySpoof] All tests passed!" << std::endl;
+}

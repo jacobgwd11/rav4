@@ -1,0 +1,40 @@
+#include "spoof.h"
+
+const int PACKET_LEN = 62;
+unsigned char HEALTHY_PACKET[PACKET_LEN];
+
+unsigned char checksum(unsigned char *arr, int len) {
+  unsigned char out = 0;
+  for (int i = 0; i < len; i++) {
+    out ^= arr[i];
+  }
+  return out;
+}
+
+void init_packet() {
+  int i = 0;
+  HEALTHY_PACKET[i++] = 255;            // header
+  HEALTHY_PACKET[i++] = PACKET_LEN - 2; // header: length
+  HEALTHY_PACKET[i++] = 49;             // header: unknown
+  for (int j = 0; j < 24; j++) {
+    // voltage
+    HEALTHY_PACKET[i++] = 212; // low byte
+    HEALTHY_PACKET[i++] = 55;  // high byte
+  }
+  for (int j = 0; j < 4; j++) {
+    // temperature
+    // TODO: entirely made-up. What is reasonable?
+    HEALTHY_PACKET[i++] = 47; // low byte
+    HEALTHY_PACKET[i++] = 26; // high byte
+  }
+  HEALTHY_PACKET[i++] = 0; // padding to reach full length?
+  HEALTHY_PACKET[i++] = 0;
+
+  HEALTHY_PACKET[i] = checksum(HEALTHY_PACKET + 1, i - 1);
+  i++;
+}
+
+int healthy_packet(unsigned char **packet) {
+  *packet = HEALTHY_PACKET;
+  return PACKET_LEN;
+}
