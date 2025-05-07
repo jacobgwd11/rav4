@@ -38,3 +38,17 @@ int healthy_packet(unsigned char **packet) {
   *packet = HEALTHY_PACKET;
   return PACKET_LEN;
 }
+
+#if OSCILLATE_VOLTAGE
+void set_voltage(int voltage) {
+  voltage *= 1000;
+  unsigned char low = voltage & 0xff;
+  unsigned char high = (voltage >> 8) & 0xff;
+
+  int i = 3;
+  for (int j = 0; j < 24; j++) {
+    HEALTHY_PACKET[i++] = low;
+    HEALTHY_PACKET[i++] = high;
+  }
+}
+#endif

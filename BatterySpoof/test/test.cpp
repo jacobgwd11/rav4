@@ -39,9 +39,25 @@ void test_healthy_packet() {
   }
 }
 
+void test_set_voltage() {
+#if OSCILLATE_VOLTAGE
+  init_packet();
+  set_voltage(13);
+
+  unsigned char *packet;
+  int length = healthy_packet(&packet);
+
+  for (int i = 3; i < 3 + 24 * 2; i += 2) {
+    int voltage = (packet[i + 1] << 8) + packet[i];
+    assert(13000 == voltage);
+  }
+#endif
+}
+
 void run_tests() {
   test_checksum();
   test_healthy_packet();
+  test_set_voltage();
 }
 
 int main(int argc, char **argv) {
