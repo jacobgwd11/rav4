@@ -1,5 +1,5 @@
-#ifndef RAV4_SPOOF_H
-#define RAV4_SPOOF_H
+#ifndef RAV4_SPOOF_HPP
+#define RAV4_SPOOF_HPP
 
 void init_packet();
 int healthy_packet(unsigned char **);

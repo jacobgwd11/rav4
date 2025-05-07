@@ -1,7 +1,7 @@
 #include <assert.h>
 #include <iostream>
 
-#include "../spoof.h"
+#include "../spoof.hpp"
 
 void test_checksum() {
   unsigned char arr[4] = {1, 1, 2, 4};

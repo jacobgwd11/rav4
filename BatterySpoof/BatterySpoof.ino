@@ -1,4 +1,4 @@
-#include "spoof.h"
+#include "spoof.hpp"
 
 void setup() {
   Serial.begin(2400, SERIAL_8N1);

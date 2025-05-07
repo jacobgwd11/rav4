@@ -1,4 +1,4 @@
-#include "spoof.h"
+#include "spoof.hpp"
 
 const int PACKET_LEN = 62;
 unsigned char HEALTHY_PACKET[PACKET_LEN];
