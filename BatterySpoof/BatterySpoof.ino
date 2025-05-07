@@ -15,8 +15,8 @@ void loop() {
   if (Serial.available() == 0)
     return;
 
-  // TODO: what do we read from the car?
   for (signed char b = -1; b != -1; b = Serial.read()) {
+    // read and ignore — "a few bytes, always the same"
   }
 
 #if OSCILLATE_VOLTAGE
