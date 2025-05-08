@@ -3,7 +3,7 @@
 
 void init_packet();
 int healthy_packet(unsigned char **);
-unsigned char checksum(unsigned char *, int);
+unsigned char checksum(const unsigned char *arr, int len);
 
 #if OSCILLATE_VOLTAGE
 void set_voltage(int);

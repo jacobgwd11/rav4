@@ -1,9 +1,9 @@
 #include "spoof.hpp"
 
-const int PACKET_LEN = 62;
+constexpr int PACKET_LEN = 62;
 unsigned char HEALTHY_PACKET[PACKET_LEN];
 
-unsigned char checksum(unsigned char *arr, int len) {
+unsigned char checksum(const unsigned char *arr, const int len) {
   unsigned char out = 0;
   for (int i = 0; i < len; i++) {
     out ^= arr[i];

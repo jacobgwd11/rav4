@@ -1,10 +1,10 @@
-#include <assert.h>
+#include <cassert>
 #include <iostream>
 
 #include "../spoof.hpp"
 
 void test_checksum() {
-  unsigned char arr[4] = {1, 1, 2, 4};
+  constexpr unsigned char arr[4] = {1, 1, 2, 4};
 
   assert(1 == checksum(arr, 1));
   assert(0 == checksum(arr, 2));
@@ -15,7 +15,7 @@ void test_healthy_packet() {
   init_packet();
 
   unsigned char *packet;
-  int length = healthy_packet(&packet);
+  const int length = healthy_packet(&packet);
 
   assert(255 == packet[0]);
   assert(length - 2 == packet[1]);
@@ -29,12 +29,12 @@ void test_healthy_packet() {
   assert(packet[packet[1] + 1] == sum);
 
   for (int i = 3; i < 3 + 24 * 2; i += 2) {
-    int voltage = (packet[i + 1] << 8) + packet[i];
+    const int voltage = (packet[i + 1] << 8) + packet[i];
     assert(14292 == voltage);
   }
 
   for (int i = 3 + 24 * 2; i < 3 + 24 * 2 + 4 * 2; i += 2) {
-    int temperature = (packet[i + 1] << 8) + packet[i];
+    const int temperature = (packet[i + 1] << 8) + packet[i];
     assert(6703 == temperature);
   }
 }
@@ -45,10 +45,10 @@ void test_set_voltage() {
   set_voltage(13);
 
   unsigned char *packet;
-  int length = healthy_packet(&packet);
+  healthy_packet(&packet);
 
   for (int i = 3; i < 3 + 24 * 2; i += 2) {
-    int voltage = (packet[i + 1] << 8) + packet[i];
+    const int voltage = (packet[i + 1] << 8) + packet[i];
     assert(13000 == voltage);
   }
 #endif
