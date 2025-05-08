@@ -45,12 +45,14 @@ void test_set_voltage() {
   set_voltage(13);
 
   unsigned char *packet;
-  healthy_packet(&packet);
+  const int length = healthy_packet(&packet);
 
   for (int i = 3; i < 3 + 24 * 2; i += 2) {
     const int voltage = (packet[i + 1] << 8) + packet[i];
     assert(13000 == voltage);
   }
+
+  assert(0xff == checksum(packet, length));
 #endif
 }
 

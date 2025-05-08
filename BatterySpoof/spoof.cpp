@@ -50,5 +50,6 @@ void set_voltage(int voltage) {
     HEALTHY_PACKET[i++] = low;
     HEALTHY_PACKET[i++] = high;
   }
+  HEALTHY_PACKET[PACKET_LEN - 1] = checksum(HEALTHY_PACKET + 1, PACKET_LEN - 2);
 }
 #endif
