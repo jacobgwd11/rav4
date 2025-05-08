@@ -1,15 +1,17 @@
 #include "spoof.hpp"
 
+#if OSCILLATE_VOLTAGE
+#define OSCILLATE_PERIOD 60000 // one minute
+unsigned long t0;
+#endif
+
 void setup() {
   Serial.begin(2400, SERIAL_8N1);
   init_packet();
-}
-
 #if OSCILLATE_VOLTAGE
-#define OSCILLATE_PERIOD 60000 // one minute
-unsigned long last_switch = millis();
-bool osc_high = false;
+  t0 = millis();
 #endif
+}
 
 void loop() {
   if (Serial.available() == 0)
@@ -20,11 +22,8 @@ void loop() {
   }
 
 #if OSCILLATE_VOLTAGE
-  if (millis() - last_switch > OSCILLATE_PERIOD) {
-    osc_high = !osc_high;
-    last_switch = millis();
-    set_voltage(osc_high ? 14 : 11);
-  }
+  bool osc_high = (bool)(((millis() - t0) / OSCILLATE_PERIOD) % 2);
+  set_voltage(osc_high ? 14 : 11);
 #endif
 
   unsigned char *packet;
