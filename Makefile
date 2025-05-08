@@ -1,3 +1,8 @@
+.PHONY: all
+all: build test
+
+CXX=clang++
+
 .PHONY: build
 build: BatterySpoof/build/arduino.renesas_uno.minima/BatterySpoof.ino.elf
 
@@ -37,7 +42,7 @@ build-test: BatterySpoof/test/build/test
 
 BatterySpoof/test/build/test: BatterySpoof/test/test.cpp BatterySpoof/spoof.hpp BatterySpoof/spoof.cpp
 	mkdir -p BatterySpoof/test/build
-	clang++ BatterySpoof/test/test.cpp BatterySpoof/spoof.cpp -o BatterySpoof/test/build/test \
+	$(CXX) BatterySpoof/test/test.cpp BatterySpoof/spoof.cpp -o BatterySpoof/test/build/test \
 		$(extra_compilation_flags)
 
 .PHONY: run-test
