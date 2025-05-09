@@ -15,9 +15,16 @@ ifdef OSCILLATE_VOLTAGE
 	extra_compilation_flags = "-DOSCILLATE_VOLTAGE"
 endif
 
+fqbn = arduino:renesas_uno:minima
+
 BatterySpoof/build/arduino.renesas_uno.minima/BatterySpoof.ino.elf: BatterySpoof/BatterySpoof.ino BatterySpoof/spoof.hpp BatterySpoof/spoof.cpp
-	arduino-cli compile --fqbn arduino:renesas_uno:minima BatterySpoof --export-binaries --warnings all \
+	arduino-cli compile --fqbn $(fqbn) BatterySpoof --export-binaries --warnings all \
 		--build-property compiler.cpp.extra_flags=$(extra_compilation_flags)
+
+.PHONY: install
+install: build
+	arduino-cli upload -p $$(arduino-cli board list | grep arduino:renesas_uno:minima | cut -f 1 -d ' ') \
+		--fqbn $(fqbn) BatterySpoof --build-path ./BatterySpoof/build/$(subst :,.,$(fqbn))
 
 .PHONY: clean
 clean: clean-test

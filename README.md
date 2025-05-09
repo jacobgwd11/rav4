@@ -32,7 +32,8 @@ Development tasks can be accomplished with Make:
 
 ## Build/Install
 
-TODO: create Makefile target to install on-device
+Connect the Arduino via USB.
+Run `make install` to install the project to the connected Arduino.
 
 ## References
 
