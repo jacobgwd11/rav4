@@ -20,6 +20,18 @@ void loop() {
   if (Serial1.available() == 0)
     return;
 
+  delay(100);
+#if DEBUG_LOG
+  Serial.println("reading bytes:");
+#endif
+  for (signed int b = Serial1.read(); b != -1; b = Serial1.read()) {
+    // read and ignore — "a few bytes, always the same"
+#if DEBUG_LOG
+    Serial.print("0x");
+    Serial.println(b, HEX);
+#endif
+  }
+
 #if OSCILLATE_VOLTAGE
   bool osc_high = (bool)(((millis() - t0) / OSCILLATE_PERIOD) % 2);
   set_voltage(osc_high ? 14 : 11);
@@ -37,9 +49,4 @@ void loop() {
   Serial.print(packet_len);
   Serial.println(" bytes");
 #endif
-
-  delay(100);
-  for (signed int b = Serial1.read(); b != -1; b = Serial1.read()) {
-    // read and ignore — "a few bytes, always the same"
-  }
 }
