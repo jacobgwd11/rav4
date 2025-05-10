@@ -6,7 +6,7 @@ unsigned long t0;
 #endif
 
 void setup() {
-  Serial.begin(2400, SERIAL_8N1);
+  Serial1.begin(2400, SERIAL_8N1);
   init_packet();
 #if OSCILLATE_VOLTAGE
   t0 = millis();
@@ -14,10 +14,10 @@ void setup() {
 }
 
 void loop() {
-  if (Serial.available() == 0)
+  if (Serial1.available() == 0)
     return;
 
-  for (signed char b = -1; b != -1; b = Serial.read()) {
+  for (signed int b = Serial1.read(); b != -1; b = Serial1.read()) {
     // read and ignore — "a few bytes, always the same"
   }
 
@@ -29,5 +29,5 @@ void loop() {
   unsigned char *packet;
   int packet_len = healthy_packet(&packet);
   // TODO: is it possible that some-but-not-all is sent?
-  Serial.write(packet, packet_len);
+  Serial1.write(packet, packet_len);
 }
