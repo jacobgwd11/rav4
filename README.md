@@ -35,6 +35,9 @@ Development tasks can be accomplished with Make:
 Connect the Arduino via USB.
 Run `make install` to install the project to the connected Arduino.
 
+While the Arduino is connected via USB, run `make monitor` to watch its log
+output.
+
 ## References
 
 - [Arduino language reference](https://docs.arduino.cc/language-reference/)

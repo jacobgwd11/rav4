@@ -26,6 +26,10 @@ install: build
 	arduino-cli upload -p $$(arduino-cli board list | grep arduino:renesas_uno:minima | cut -f 1 -d ' ') \
 		--fqbn $(fqbn) BatterySpoof --build-path ./BatterySpoof/build/$(subst :,.,$(fqbn))
 
+.PHONY: monitor
+monitor:
+	arduino-cli monitor -p $$(arduino-cli board list | grep arduino:renesas_uno:minima | cut -f 1 -d ' ')
+
 .PHONY: clean
 clean: clean-test
 	rm -rf BatterySpoof/build
