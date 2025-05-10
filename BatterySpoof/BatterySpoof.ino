@@ -30,7 +30,6 @@ void loop() {
 
   unsigned char *packet;
   int packet_len = healthy_packet(&packet);
-  // TODO: is it possible that some-but-not-all is sent?
   Serial1.write(packet, packet_len);
 
 #if DEBUG_LOG
