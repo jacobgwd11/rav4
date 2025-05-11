@@ -32,7 +32,7 @@ void test_healthy_packet() {
 
   for (int i = 3; i < 3 + 24 * 2; i += 2) {
     const int voltage = (packet[i + 1] << 8) + packet[i];
-    assert(14292 == voltage);
+    assert(12800 == voltage);
   }
 
   for (int i = 3 + 24 * 2; i < 3 + 24 * 2 + 4 * 2; i += 2) {

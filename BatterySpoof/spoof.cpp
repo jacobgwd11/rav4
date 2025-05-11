@@ -17,9 +17,9 @@ void init_packet() {
   HEALTHY_PACKET[i++] = PACKET_LEN - 2; // header: length
   HEALTHY_PACKET[i++] = 49;             // header: unknown
   for (int j = 0; j < 24; j++) {
-    // voltage
-    HEALTHY_PACKET[i++] = 212; // low byte
-    HEALTHY_PACKET[i++] = 55;  // high byte
+    // voltage: 12.8 V
+    HEALTHY_PACKET[i++] = 0;  // low byte
+    HEALTHY_PACKET[i++] = 50; // high byte
   }
   for (int j = 0; j < 4; j++) {
     // temperature
