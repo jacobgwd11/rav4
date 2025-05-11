@@ -5,6 +5,6 @@ void init_packet();
 int healthy_packet(unsigned char **);
 unsigned char checksum(const unsigned char *arr, int len);
 void set_voltage(int);
-void set_temperature(int);
+void set_temperature(int, int);
 
 #endif

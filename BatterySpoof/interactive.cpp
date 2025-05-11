@@ -51,14 +51,18 @@ const char *voltage_command(const char *command) {
 }
 
 const char *temperature_command(const char *command) {
-  if (!command[0] || !is_whitespace(command[0])) {
+  char next_char = command[0];
+  if (!next_char || !('1' <= next_char && next_char <= '4')) {
+    return "error: Expected temperature sensor number immediately after 'T'";
+  }
+  if (!command[1] || !is_whitespace(command[1])) {
     return "error: Expected space after temperature command";
   }
-  const int t = parse_int(command + 1);
+  const int t = parse_int(command + 2);
   if (-1 == t) {
-    return "error: Temperature command expects a single number (e.g. T 24)";
+    return "error: Temperature command expects a single number (e.g. T2 24)";
   }
-  set_temperature(t);
+  set_temperature(t, next_char - '1');
   return "Set temperature.";
 }
 
@@ -80,7 +84,8 @@ const char *handle_command(const char *command) {
     return temperature_command(command + 1);
   default:
     return "Unknown command. Valid commands are:\n"
-           "  V [number] -- set voltage (whole numbers only)\n"
-           "  T [number] -- set temperature (whole numbers only)";
+           "  V [number]    -- set voltage (whole numbers only)\n"
+           "  T[N] [number] -- set temperature (whole numbers only).\n"
+           "                   (supports T1–T4)";
   }
 }

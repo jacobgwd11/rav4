@@ -52,15 +52,13 @@ void set_voltage(int voltage) {
   HEALTHY_PACKET[PACKET_LEN - 1] = checksum(HEALTHY_PACKET + 1, PACKET_LEN - 2);
 }
 
-void set_temperature(int temp) {
+void set_temperature(int temp, int ind) {
   temp *= 1000;
   unsigned char low = temp & 0xff;
   unsigned char high = (temp >> 8) & 0xff;
 
-  int i = 3 + 24 * 2;
-  for (int j = 0; j < 4; j++) {
-    HEALTHY_PACKET[i++] = low;
-    HEALTHY_PACKET[i++] = high;
-  }
+  int i = 3 + 24 * 2 + ind * 2;
+  HEALTHY_PACKET[i++] = low;
+  HEALTHY_PACKET[i++] = high;
   HEALTHY_PACKET[PACKET_LEN - 1] = checksum(HEALTHY_PACKET + 1, PACKET_LEN - 2);
 }

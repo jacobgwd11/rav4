@@ -58,15 +58,27 @@ void test_set_voltage() {
 
 void test_set_temperature() {
   init_packet();
-  set_temperature(27);
+  set_temperature(27, 0);
+  set_temperature(35, 1);
+  set_temperature(12, 2);
+  set_temperature(6, 3);
 
   unsigned char *packet;
   const int length = healthy_packet(&packet);
 
-  for (int i = 3 + 24 * 2; i < 3 + 24 * 2 + 4 * 2; i += 2) {
-    const int temperature = (packet[i + 1] << 8) + packet[i];
-    assert(27000 == temperature);
-  }
+  int i = 3 + 24 * 2;
+  const int temperature1 = (packet[i + 1] << 8) + packet[i];
+  i += 2;
+  const int temperature2 = (packet[i + 1] << 8) + packet[i];
+  i += 2;
+  const int temperature3 = (packet[i + 1] << 8) + packet[i];
+  i += 2;
+  const int temperature4 = (packet[i + 1] << 8) + packet[i];
+
+  assert(27000 == temperature1);
+  assert(35000 == temperature2);
+  assert(12000 == temperature3);
+  assert(6000 == temperature4);
 
   assert(0xff == checksum(packet, length));
 }
@@ -80,13 +92,15 @@ void test_handle_command() {
   assert(0 == strlen(handle_command("            ")));
   assert(contains(handle_command("K 2"), "Unknown command"));
   assert(contains(handle_command("V2 "), "Expected space"));
-  assert(contains(handle_command("T2 "), "Expected space"));
+  assert(contains(handle_command("T2"), "Expected space"));
+  assert(contains(handle_command("T2 "), "expects a single number"));
+  assert(contains(handle_command("T 2"), "Expected temperature sensor number"));
   assert(contains(handle_command("V 2 4"), "expects a single number"));
-  assert(contains(handle_command("T 2 4"), "expects a single number"));
+  assert(contains(handle_command("T1 2 4"), "expects a single number"));
   assert(contains(handle_command("V 2a"), "expects a single number"));
-  assert(contains(handle_command("T 2a"), "expects a single number"));
+  assert(contains(handle_command("T1 2a"), "expects a single number"));
   assert(contains(handle_command("  V  \t20"), "Set voltage"));
-  assert(contains(handle_command("\t   T  13 "), "Set temperature"));
+  assert(contains(handle_command("\t   T1  13 "), "Set temperature"));
 
   init_packet();
   handle_command("V 13");
@@ -95,7 +109,7 @@ void test_handle_command() {
   assert(0xc8 == packet[3]);
   assert(0x32 == packet[4]);
 
-  handle_command("T 21");
+  handle_command("T1 21");
   healthy_packet(&packet);
   assert(0x8 == packet[3 + 24 * 2]);
   assert(0x52 == packet[3 + 24 * 2 + 1]);
