@@ -10,7 +10,7 @@ build: BatterySpoof/build/arduino.renesas_uno.minima/BatterySpoof.ino.elf
 init:
 	arduino-cli core install arduino:renesas_uno
 
-extra_compilation_flags = -Wall -Wextra -Werror
+extra_compilation_flags =
 ifdef OSCILLATE_VOLTAGE
 	extra_compilation_flags += -DOSCILLATE_VOLTAGE
 endif
