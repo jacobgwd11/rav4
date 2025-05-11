@@ -71,7 +71,7 @@ void test_set_temperature() {
   assert(0xff == checksum(packet, length));
 }
 
-bool contains(const char *s1, const char *s2) { return strstr(s1, s2) != NULL; }
+bool contains(const char *s1, const char *s2) { return strstr(s1, s2) != nullptr; }
 
 void test_handle_command() {
   assert(0 == strlen(handle_command("")));

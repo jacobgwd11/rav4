@@ -12,7 +12,7 @@ bool is_whitespace(char c) {
   }
 }
 
-bool is_digit(char c) { return '0' <= c && c <= '9'; }
+bool is_digit(const char c) { return '0' <= c && c <= '9'; }
 
 int parse_int(const char *s) {
   while (s[0] && is_whitespace(s[0])) {
@@ -42,7 +42,7 @@ const char *voltage_command(const char *command) {
   if (!command[0] || !is_whitespace(command[0])) {
     return "error: Expected space after voltage command";
   }
-  int v = parse_int(command + 1);
+  const int v = parse_int(command + 1);
   if (-1 == v) {
     return "error: Voltage command expects a single number (e.g. V 13)";
   }
@@ -54,7 +54,7 @@ const char *temperature_command(const char *command) {
   if (!command[0] || !is_whitespace(command[0])) {
     return "error: Expected space after temperature command";
   }
-  int t = parse_int(command + 1);
+  const int t = parse_int(command + 1);
   if (-1 == t) {
     return "error: Temperature command expects a single number (e.g. T 24)";
   }
