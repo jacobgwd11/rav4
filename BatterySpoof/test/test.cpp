@@ -1,6 +1,8 @@
 #include <cassert>
+#include <cstring>
 #include <iostream>
 
+#include "../interactive.hpp"
 #include "../spoof.hpp"
 
 void test_checksum() {
@@ -40,7 +42,6 @@ void test_healthy_packet() {
 }
 
 void test_set_voltage() {
-#if OSCILLATE_VOLTAGE
   init_packet();
   set_voltage(13);
 
@@ -53,16 +54,60 @@ void test_set_voltage() {
   }
 
   assert(0xff == checksum(packet, length));
-#endif
+}
+
+void test_set_temperature() {
+  init_packet();
+  set_temperature(27);
+
+  unsigned char *packet;
+  const int length = healthy_packet(&packet);
+
+  for (int i = 3 + 24 * 2; i < 3 + 24 * 2 + 4 * 2; i += 2) {
+    const int temperature = (packet[i + 1] << 8) + packet[i];
+    assert(27000 == temperature);
+  }
+
+  assert(0xff == checksum(packet, length));
+}
+
+bool contains(const char *s1, const char *s2) { return strstr(s1, s2) != NULL; }
+
+void test_handle_command() {
+  assert(0 == strlen(handle_command("")));
+  assert(0 == strlen(handle_command("            ")));
+  assert(contains(handle_command("K 2"), "Unknown command"));
+  assert(contains(handle_command("V2 "), "Expected space"));
+  assert(contains(handle_command("T2 "), "Expected space"));
+  assert(contains(handle_command("V 2 4"), "expects a single number"));
+  assert(contains(handle_command("T 2 4"), "expects a single number"));
+  assert(contains(handle_command("V 2a"), "expects a single number"));
+  assert(contains(handle_command("T 2a"), "expects a single number"));
+  assert(contains(handle_command("  V  \t20"), "Set voltage"));
+  assert(contains(handle_command("\t   T  13 "), "Set temperature"));
+
+  init_packet();
+  handle_command("V 13");
+  unsigned char *packet;
+  healthy_packet(&packet);
+  assert(0xc8 == packet[3]);
+  assert(0x32 == packet[4]);
+
+  handle_command("T 21");
+  healthy_packet(&packet);
+  assert(0x8 == packet[3 + 24 * 2]);
+  assert(0x52 == packet[3 + 24 * 2 + 1]);
 }
 
 void run_tests() {
   test_checksum();
   test_healthy_packet();
   test_set_voltage();
+  test_set_temperature();
+  test_handle_command();
 }
 
-int main(int argc, char **argv) {
+int main(int, char **) {
   run_tests();
   std::cout << "[BatterySpoof] All tests passed!" << std::endl;
 }

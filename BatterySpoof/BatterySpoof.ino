@@ -1,4 +1,7 @@
 #include "spoof.hpp"
+#if INTERACTIVE
+#include "interactive.hpp"
+#endif
 
 #if OSCILLATE_VOLTAGE
 #define OSCILLATE_PERIOD 60000 // one minute
@@ -8,7 +11,7 @@ unsigned long t0;
 void setup() {
   Serial1.begin(2400, SERIAL_8N1);
   init_packet();
-#if DEBUG_LOG
+#if DEBUG_LOG || INTERACTIVE
   Serial.begin(9600);
 #endif
 #if OSCILLATE_VOLTAGE
@@ -17,9 +20,17 @@ void setup() {
 }
 
 void loop() {
-  if (Serial1.available() == 0)
-    return;
+  if (Serial1.available() != 0) {
+    car_request();
+  }
+#if INTERACTIVE
+  else if (Serial.available() != 0) {
+    interactive();
+  }
+#endif
+}
 
+void car_request() {
   delay(100);
 #if DEBUG_LOG
   Serial.println("reading bytes:");
@@ -50,3 +61,14 @@ void loop() {
   Serial.println(" bytes");
 #endif
 }
+
+#if INTERACTIVE
+void interactive() {
+  String command = Serial.readStringUntil('\n');
+  const char *response = handle_command(command.c_str());
+  if (!response[0])
+    return;
+
+  Serial.println(response);
+}
+#endif

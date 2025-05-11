@@ -39,7 +39,6 @@ int healthy_packet(unsigned char **packet) {
   return PACKET_LEN;
 }
 
-#if OSCILLATE_VOLTAGE
 void set_voltage(int voltage) {
   voltage *= 1000;
   unsigned char low = voltage & 0xff;
@@ -52,4 +51,16 @@ void set_voltage(int voltage) {
   }
   HEALTHY_PACKET[PACKET_LEN - 1] = checksum(HEALTHY_PACKET + 1, PACKET_LEN - 2);
 }
-#endif
+
+void set_temperature(int temp) {
+  temp *= 1000;
+  unsigned char low = temp & 0xff;
+  unsigned char high = (temp >> 8) & 0xff;
+
+  int i = 3 + 24 * 2;
+  for (int j = 0; j < 4; j++) {
+    HEALTHY_PACKET[i++] = low;
+    HEALTHY_PACKET[i++] = high;
+  }
+  HEALTHY_PACKET[PACKET_LEN - 1] = checksum(HEALTHY_PACKET + 1, PACKET_LEN - 2);
+}

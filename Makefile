@@ -10,17 +10,20 @@ build: BatterySpoof/build/arduino.renesas_uno.minima/BatterySpoof.ino.elf
 init:
 	arduino-cli core install arduino:renesas_uno
 
-extra_compilation_flags =
+extra_compilation_flags = -Wall -Wextra -Werror
 ifdef OSCILLATE_VOLTAGE
 	extra_compilation_flags += -DOSCILLATE_VOLTAGE
 endif
 ifdef DEBUG_LOG
 	extra_compilation_flags += -DDEBUG_LOG
 endif
+ifdef INTERACTIVE
+	extra_compilation_flags += -DINTERACTIVE
+endif
 
 fqbn = arduino:renesas_uno:minima
 
-BatterySpoof/build/arduino.renesas_uno.minima/BatterySpoof.ino.elf: BatterySpoof/BatterySpoof.ino BatterySpoof/spoof.hpp BatterySpoof/spoof.cpp
+BatterySpoof/build/arduino.renesas_uno.minima/BatterySpoof.ino.elf: BatterySpoof/BatterySpoof.ino BatterySpoof/spoof.hpp BatterySpoof/spoof.cpp BatterySpoof/interactive.hpp BatterySpoof/interactive.cpp
 	arduino-cli compile --fqbn $(fqbn) BatterySpoof --export-binaries --warnings all \
 		--build-property compiler.cpp.extra_flags="$(extra_compilation_flags)"
 
@@ -36,9 +39,6 @@ monitor:
 .PHONY: clean
 clean: clean-test
 	rm -rf BatterySpoof/build
-
-.PHONY: clean-test
-clean-test:
 	rm -rf BatterySpoof/test/build
 
 .PHONY: format
@@ -49,15 +49,14 @@ format:
 check: format build test
 
 .PHONY: test
-test: clean-test build-test run-test
+test: build-test run-test
 
 .PHONY: build-test
 build-test: BatterySpoof/test/build/test
 
-BatterySpoof/test/build/test: BatterySpoof/test/test.cpp BatterySpoof/spoof.hpp BatterySpoof/spoof.cpp
+BatterySpoof/test/build/test: BatterySpoof/test/test.cpp BatterySpoof/spoof.hpp BatterySpoof/spoof.cpp BatterySpoof/interactive.hpp BatterySpoof/interactive.cpp
 	mkdir -p BatterySpoof/test/build
-	$(CXX) BatterySpoof/test/test.cpp BatterySpoof/spoof.cpp -o BatterySpoof/test/build/test \
-		$(extra_compilation_flags)
+	$(CXX) $(extra_compilation_flags) -o BatterySpoof/test/build/test BatterySpoof/test/test.cpp BatterySpoof/spoof.cpp BatterySpoof/interactive.cpp
 
 .PHONY: run-test
 run-test: build-test

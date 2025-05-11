@@ -4,9 +4,7 @@
 void init_packet();
 int healthy_packet(unsigned char **);
 unsigned char checksum(const unsigned char *arr, int len);
-
-#if OSCILLATE_VOLTAGE
 void set_voltage(int);
-#endif
+void set_temperature(int);
 
 #endif
