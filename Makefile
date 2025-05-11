@@ -37,7 +37,7 @@ monitor:
 	arduino-cli monitor -p $$(arduino-cli board list | grep arduino:renesas_uno:minima | cut -f 1 -d ' ')
 
 .PHONY: clean
-clean: clean-test
+clean:
 	rm -rf BatterySpoof/build
 	rm -rf BatterySpoof/test/build
 
