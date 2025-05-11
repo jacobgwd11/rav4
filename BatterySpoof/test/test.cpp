@@ -46,11 +46,22 @@ void test_set_voltage() {
   set_voltage(13);
 
   unsigned char *packet;
-  const int length = healthy_packet(&packet);
+  int length = healthy_packet(&packet);
 
   for (int i = 3; i < 3 + 24 * 2; i += 2) {
     const int voltage = (packet[i + 1] << 8) + packet[i];
     assert(13000 == voltage);
+  }
+
+  assert(0xff == checksum(packet, length));
+
+  set_voltage((float)13.456);
+
+  length = healthy_packet(&packet);
+
+  for (int i = 3; i < 3 + 24 * 2; i += 2) {
+    const int voltage = (packet[i + 1] << 8) + packet[i];
+    assert(13456 == voltage);
   }
 
   assert(0xff == checksum(packet, length));
@@ -59,8 +70,8 @@ void test_set_voltage() {
 void test_set_temperature() {
   init_packet();
   set_temperature(27, 0);
-  set_temperature(35, 1);
-  set_temperature(12, 2);
+  set_temperature((float)35.678, 1);
+  set_temperature((float)12.001, 2);
   set_temperature(6, 3);
 
   unsigned char *packet;
@@ -76,8 +87,8 @@ void test_set_temperature() {
   const int temperature4 = (packet[i + 1] << 8) + packet[i];
 
   assert(27000 == temperature1);
-  assert(35000 == temperature2);
-  assert(12000 == temperature3);
+  assert(35678 == temperature2);
+  assert(12001 == temperature3);
   assert(6000 == temperature4);
 
   assert(0xff == checksum(packet, length));
@@ -99,8 +110,13 @@ void test_handle_command() {
   assert(contains(handle_command("T1 2 4"), "expects a single number"));
   assert(contains(handle_command("V 2a"), "expects a single number"));
   assert(contains(handle_command("T1 2a"), "expects a single number"));
+  assert(contains(handle_command("T1 2."), "expects a single number"));
+  assert(contains(handle_command("T1 .2"), "expects a single number"));
+  assert(contains(handle_command("T1 ."), "expects a single number"));
   assert(contains(handle_command("  V  \t20"), "Set voltage"));
+  assert(contains(handle_command("  V  \t20.002"), "Set voltage"));
   assert(contains(handle_command("\t   T1  13 "), "Set temperature"));
+  assert(contains(handle_command("\t   T1  13.456 "), "Set temperature"));
 
   init_packet();
   handle_command("V 13");

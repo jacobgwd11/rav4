@@ -14,18 +14,29 @@ bool is_whitespace(char c) {
 
 bool is_digit(const char c) { return '0' <= c && c <= '9'; }
 
-int parse_int(const char *s) {
+float parse_num(const char *s) {
   while (s[0] && is_whitespace(s[0])) {
     s += 1;
   }
 
-  if (!s[0]) { // no number
+  if (!s[0] || !is_digit(s[0])) { // no number
     return -1;
   }
 
-  int out = 0;
+  float out = 0;
   for (; s[0] && is_digit(s[0]); s += 1) {
     out = 10 * out + (s[0] - '0');
+  }
+  if ('.' == s[0]) {
+    s += 1;
+    float place = 1 / 10;
+    if (!s[0] || !is_digit(s[0])) {
+      return -1;
+    }
+    for (; s[0] && is_digit(s[0]); s += 1) {
+      out += place * (s[0] - '0');
+    }
+    place /= 10;
   }
 
   while (s[0] && is_whitespace(s[0])) {
@@ -42,9 +53,9 @@ const char *voltage_command(const char *command) {
   if (!command[0] || !is_whitespace(command[0])) {
     return "error: Expected space after voltage command";
   }
-  const int v = parse_int(command + 1);
+  const int v = parse_num(command + 1);
   if (-1 == v) {
-    return "error: Voltage command expects a single number (e.g. V 13)";
+    return "error: Voltage command expects a single number (e.g. V 13.1)";
   }
   set_voltage(v);
   return "Set voltage.";
@@ -58,7 +69,7 @@ const char *temperature_command(const char *command) {
   if (!command[1] || !is_whitespace(command[1])) {
     return "error: Expected space after temperature command";
   }
-  const int t = parse_int(command + 2);
+  const int t = parse_num(command + 2);
   if (-1 == t) {
     return "error: Temperature command expects a single number (e.g. T2 24)";
   }
@@ -84,8 +95,7 @@ const char *handle_command(const char *command) {
     return temperature_command(command + 1);
   default:
     return "Unknown command. Valid commands are:\n"
-           "  V [number]    -- set voltage (whole numbers only)\n"
-           "  T[N] [number] -- set temperature (whole numbers only).\n"
-           "                   (supports T1–T4)";
+           "  V [number]    -- set voltage\n"
+           "  T[N] [number] -- set temperature (supports T1–T4)";
   }
 }

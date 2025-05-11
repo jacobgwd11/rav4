@@ -39,8 +39,10 @@ int healthy_packet(unsigned char **packet) {
   return PACKET_LEN;
 }
 
-void set_voltage(int voltage) {
-  voltage *= 1000;
+void set_voltage(int voltage) { set_voltage((float)voltage); }
+
+void set_voltage(float v) {
+  int voltage = (int)(v * 1000);
   unsigned char low = voltage & 0xff;
   unsigned char high = (voltage >> 8) & 0xff;
 
@@ -52,8 +54,10 @@ void set_voltage(int voltage) {
   HEALTHY_PACKET[PACKET_LEN - 1] = checksum(HEALTHY_PACKET + 1, PACKET_LEN - 2);
 }
 
-void set_temperature(int temp, int ind) {
-  temp *= 1000;
+void set_temperature(int temp, int ind) { set_temperature((float)temp, ind); }
+
+void set_temperature(float t, int ind) {
+  int temp = (int)(t * 1000);
   unsigned char low = temp & 0xff;
   unsigned char high = (temp >> 8) & 0xff;
 
