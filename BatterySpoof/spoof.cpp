@@ -22,10 +22,9 @@ void init_packet() {
     HEALTHY_PACKET[i++] = 50; // high byte
   }
   for (int j = 0; j < 4; j++) {
-    // temperature
-    // TODO: entirely made-up. What is reasonable?
-    HEALTHY_PACKET[i++] = 47; // low byte
-    HEALTHY_PACKET[i++] = 26; // high byte
+    // temperature: 10 Celsius
+    HEALTHY_PACKET[i++] = 16; // low byte
+    HEALTHY_PACKET[i++] = 39; // high byte
   }
   HEALTHY_PACKET[i++] = 0; // padding to reach full length?
   HEALTHY_PACKET[i++] = 0;
