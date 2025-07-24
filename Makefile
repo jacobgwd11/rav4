@@ -3,12 +3,21 @@ all: build test
 
 CXX=clang++
 
+fqbn := $(strip $(shell cat .board_name 2>/dev/null)) # make v3 doesn't support "file"
+fqbn := $(strip $(fqbn))
+ifeq ($(fqbn),)
+	fqbn := arduino:renesas_uno:minima
+endif
+fqbn_path := $(subst :,.,$(fqbn))
+
 .PHONY: build
-build: BatterySpoof/build/arduino.renesas_uno.minima/BatterySpoof.ino.elf
+build: BatterySpoof/build/$(fqbn_path)/BatterySpoof.ino.elf
+
+space := $() $()
 
 .PHONY: init
 init:
-	arduino-cli core install arduino:renesas_uno
+	arduino-cli core install $(subst $(space),:,$(wordlist 1,2,$(subst :, ,$(fqbn))))
 
 extra_compilation_flags =
 ifdef OSCILLATE_VOLTAGE
@@ -21,20 +30,18 @@ ifdef INTERACTIVE
 	extra_compilation_flags += -DINTERACTIVE
 endif
 
-fqbn = arduino:renesas_uno:minima
-
-BatterySpoof/build/arduino.renesas_uno.minima/BatterySpoof.ino.elf: BatterySpoof/BatterySpoof.ino BatterySpoof/spoof.hpp BatterySpoof/spoof.cpp BatterySpoof/interactive.hpp BatterySpoof/interactive.cpp
+BatterySpoof/build/$(fqbn_path)/BatterySpoof.ino.elf: BatterySpoof/BatterySpoof.ino BatterySpoof/spoof.hpp BatterySpoof/spoof.cpp BatterySpoof/interactive.hpp BatterySpoof/interactive.cpp
 	arduino-cli compile --fqbn $(fqbn) BatterySpoof --export-binaries --warnings all \
 		--build-property compiler.cpp.extra_flags="$(extra_compilation_flags)"
 
 .PHONY: install
 install: build
-	arduino-cli upload -p $$(arduino-cli board list | grep arduino:renesas_uno:minima | cut -f 1 -d ' ') \
-		--fqbn $(fqbn) BatterySpoof --build-path ./BatterySpoof/build/$(subst :,.,$(fqbn))
+	arduino-cli upload -p $$(arduino-cli board list | grep $(fqbn) | cut -f 1 -d ' ') \
+		--fqbn $(fqbn) BatterySpoof --build-path ./BatterySpoof/build/$(fqbn_path)
 
 .PHONY: monitor
 monitor:
-	arduino-cli monitor -p $$(arduino-cli board list | grep arduino:renesas_uno:minima | cut -f 1 -d ' ')
+	arduino-cli monitor -p $$(arduino-cli board list | grep $(fqbn) | cut -f 1 -d ' ')
 
 .PHONY: clean
 clean:

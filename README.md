@@ -9,15 +9,28 @@ and the car will accept this.
 
 It's intended to run on an
 [Arduino UNO R4 Minima](https://docs.arduino.cc/hardware/uno-r4-minima/), but it
-can run on another Arduino board by updating the build commands in the Makefile
-to use a different fully-qualified board name (FQBN).
-It communicates over serial and RS232 using a shield such as
+can run on another Arduino board by updating some configuration.
+The program communicates over serial and RS232 using a shield such as
 [the DFRobot RS232 shield](https://www.dfrobot.com/product-1030.html).
 
 ## Setup
 
 Install the [Arduino CLI](https://github.com/arduino/arduino-cli?tab=readme-ov-file)
 according to [the installation instructions](https://arduino.github.io/arduino-cli/latest/installation/).
+
+If using an Arduino board other than the UNO R4 Minima, configure for your
+board:
+1. Determine the board's fully-qualified board name (FQBN) by connecting it to
+   your computer and running `make list`.
+2. Run the following, substituting your FQBN instead of
+   `arduino:megaavr:nona4809`:
+   ```shell
+   echo arduino:megaavr:nona4809 > .board_name
+   ```
+3. To remove this and go back to the UNO R4 Minima, run
+   ```shell
+   rm .board_name
+   ```
 
 In the project directory, run `make init`.
 
