@@ -129,6 +129,16 @@ void test_handle_command() {
   healthy_packet(&packet);
   assert(0x8 == packet[3 + 24 * 2]);
   assert(0x52 == packet[3 + 24 * 2 + 1]);
+
+  handle_command("T1 21.001");
+  healthy_packet(&packet);
+  assert(0x9 == packet[3 + 24 * 2]);
+  assert(0x52 == packet[3 + 24 * 2 + 1]);
+
+  handle_command("V 13.002");
+  healthy_packet(&packet);
+  assert(0xca == packet[3]);
+  assert(0x32 == packet[4]);
 }
 
 void run_tests() {
