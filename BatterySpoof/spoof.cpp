@@ -53,6 +53,18 @@ void set_voltage(float v) {
   HEALTHY_PACKET[PACKET_LEN - 1] = checksum(HEALTHY_PACKET + 1, PACKET_LEN - 2);
 }
 
+void set_voltage(float v, int ind) {
+  int voltage = (int)(v * 1000);
+  unsigned char low = voltage & 0xff;
+  unsigned char high = (voltage >> 8) & 0xff;
+
+  int i = 3 + 2 * ind;
+  HEALTHY_PACKET[i++] = low;
+  HEALTHY_PACKET[i++] = high;
+
+  HEALTHY_PACKET[PACKET_LEN - 1] = checksum(HEALTHY_PACKET + 1, PACKET_LEN - 2);
+}
+
 void set_temperature(int temp, int ind) { set_temperature((float)temp, ind); }
 
 void set_temperature(float t, int ind) {

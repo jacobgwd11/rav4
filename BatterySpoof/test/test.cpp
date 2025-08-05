@@ -102,7 +102,16 @@ void test_handle_command() {
   assert(0 == strlen(handle_command("")));
   assert(0 == strlen(handle_command("            ")));
   assert(contains(handle_command("K 2"), "Unknown command"));
-  assert(contains(handle_command("V2 "), "Expected space"));
+  assert(contains(handle_command("V2 "), "expects a single number"));
+  assert(contains(handle_command("V2"), "Expected space"));
+  assert(contains(handle_command("V"), "Expected something"));
+  assert(contains(handle_command("V2 a"), "expects a single number"));
+  assert(contains(handle_command("V2 3 a"), "expects a single number"));
+  assert(contains(handle_command("V2 3 3"), "expects a single number"));
+  assert(
+      contains(handle_command("V25 3"), "Expected a cell number from 1 to 24"));
+  assert(contains(handle_command("V125 3"),
+                  "Expected space following cell number"));
   assert(contains(handle_command("T2"), "Expected space"));
   assert(contains(handle_command("T2 "), "expects a single number"));
   assert(contains(handle_command("T 2"), "Expected temperature sensor number"));
@@ -124,6 +133,8 @@ void test_handle_command() {
   healthy_packet(&packet);
   assert(0xc8 == packet[3]);
   assert(0x32 == packet[4]);
+  assert(0xc8 == packet[3 + 23 * 2]);
+  assert(0x32 == packet[4 + 23 * 2]);
 
   handle_command("T1 21");
   healthy_packet(&packet);
@@ -139,6 +150,17 @@ void test_handle_command() {
   healthy_packet(&packet);
   assert(0xca == packet[3]);
   assert(0x32 == packet[4]);
+
+  handle_command("V1 10.001");
+  handle_command("V2 11.002");
+  handle_command("V24 12.003");
+  healthy_packet(&packet);
+  assert(0x11 == packet[3]);
+  assert(0x27 == packet[4]);
+  assert(0xfa == packet[5]);
+  assert(0x2a == packet[6]);
+  assert(0xe3 == packet[3 + 23 * 2]);
+  assert(0x2e == packet[4 + 23 * 2]);
 }
 
 void run_tests() {

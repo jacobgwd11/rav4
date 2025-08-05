@@ -50,14 +50,43 @@ float parse_num(const char *s) {
 }
 
 const char *voltage_command(const char *command) {
-  if (!command[0] || !is_whitespace(command[0])) {
-    return "error: Expected space after voltage command";
+  int cmd_i = 0;
+  char next_char = command[cmd_i++];
+  if (!next_char) {
+    return "error: Expected something after voltage command (e.g. V12 8.5 or V "
+           "10)";
   }
-  const float v = parse_num(command + 1);
+  bool all_cells;
+  int cell_num;
+  if (is_whitespace(next_char)) {
+    all_cells = true;
+  } else if (is_digit(next_char)) {
+    all_cells = false;
+    cell_num = next_char - '0';
+    next_char = command[cmd_i++];
+    if (is_digit(next_char)) {
+      cell_num = (10 * cell_num) + next_char - '0';
+      next_char = command[cmd_i++];
+    }
+    if (!next_char || !is_whitespace(next_char)) {
+      return "error: Expected space following cell number (e.g. V12 8)";
+    }
+    if (cell_num < 1 || cell_num > 24) {
+      return "error: Expected a cell number from 1 to 24";
+    }
+  } else {
+    return "error: Expected space or cell number from 1-24 after V (e.g. V2 "
+           "16)";
+  }
+  const float v = parse_num(command + cmd_i);
   if (-1 == v) {
     return "error: Voltage command expects a single number (e.g. V 13.1)";
   }
-  set_voltage(v);
+  if (all_cells) {
+    set_voltage(v);
+  } else {
+    set_voltage(v, cell_num - 1);
+  }
   return "Set voltage.";
 }
 
@@ -95,7 +124,8 @@ const char *handle_command(const char *command) {
     return temperature_command(command + 1);
   default:
     return "Unknown command. Valid commands are:\n"
-           "  V [number]    -- set voltage\n"
+           "  V[N] [number] -- set voltage (supports V1-V24, or just V for "
+           "all)\n"
            "  T[N] [number] -- set temperature (supports T1–T4)";
   }
 }
